@@ -2,7 +2,7 @@ import geopandas as gpd
 import numpy as np
 
 # 1. Charger votre fichier GeoJSON (Arrondissements)
-geojson_file = "limite_arrondissement_du_senegal.geojson" 
+geojson_file = "data/limite_arrondissement_du_senegal.geojson" 
 gdf = gpd.read_file(geojson_file)
 
 # 2. Calculer le diamètre en km à partir de la superficie (SUM_SUPERF)
@@ -29,7 +29,7 @@ gdf['map_format'] = gdf['latitude'].astype(str) + ", " + gdf['longitude'].astype
 df_final = gdf.drop(columns='geometry')
 
 # 8. Exporter le résultat final en fichier CSV
-df_final.to_csv("senegal_arrondissements_location.csv", index=False)
+df_final.to_csv("data/senegal_arrondissements_location.csv", index=False)
 
 print("Traitement terminé avec succès !")
 # Aperçu du résultat pour la ligne de Noto
