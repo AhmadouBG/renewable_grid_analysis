@@ -70,3 +70,18 @@ Happy modeling!
 [0m16:10:11.300265 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C1D0F4440>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C1AF2ED20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C1F2216A0>]}
 [0m16:10:11.301265 [debug] [MainThread]: Flushing usage events
 [0m16:10:13.189081 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m17:38:44.626284 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67F645BB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67E7385F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67F6459D0>]}
+
+
+============================== 17:38:44.649427 | cb55f2b5-8d27-4748-bd57-11dd358b2eee ==============================
+[0m17:38:44.649427 [info ] [MainThread]: Running with dbt=1.12.0
+[0m17:38:44.651423 [debug] [MainThread]: running dbt with arguments {'maximum_seed_size_mib': '1', 'no_print': 'None', 'static_parser': 'True', 'target_path': 'None', 'version_check': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'profiles_dir': 'C:\\Users\\Bamba\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'use_colors': 'True', 'hints_enabled': 'True', 'invocation_command': 'dbt clean', 'use_experimental_parser': 'False', 'indirect_selection': 'eager', 'log_path': 'logs'}
+[0m17:38:44.653313 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Bamba\Documents\renewable_grid_analysis\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m17:38:44.654289 [debug] [MainThread]: Command `dbt clean` failed at 17:38:44.654289 after 0.18 seconds
+[0m17:38:44.655290 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67E5138C0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67E87B260>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C67F645B80>]}
+[0m17:38:44.655290 [debug] [MainThread]: Flushing usage events
+[0m17:38:46.562963 [debug] [MainThread]: An error was encountered while trying to flush usage events

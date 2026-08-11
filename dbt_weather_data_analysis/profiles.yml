@@ -1,0 +1,7 @@
+dbt_weather_data_analysis:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "./output/database_grid_analysis.duckdb"
+      schema: 'main'
