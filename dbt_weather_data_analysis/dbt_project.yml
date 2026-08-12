@@ -22,7 +22,12 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+vars:
+  km_per_deg_lat: 111.32   # config.KM_PER_DEG_LAT
 
+seeds:
+  dbt_weather_data_analysis:
+    +schema: seeds
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
@@ -30,7 +35,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-  dbt_data_analyse:
+  dbt_weather_data_analysis:
     # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    staging:
+      +materialized: table

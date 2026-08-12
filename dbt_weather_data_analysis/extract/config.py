@@ -2,18 +2,12 @@
 config.py
 Configuration centralisée pour api_weather.py (ingestion météo par grille de points).
 """
-from pathlib import Path
-
-# --- Chemins ---
-GIT_REPO_ROOT = Path(__file__).parent
-LOCATION_FILE = GIT_REPO_ROOT / "data" / "senegal_arrondissements_location.csv"
 
 OUTPUT_HOURLY_DIR = "data_lake/grid_weather_hourly"
 OUTPUT_DAILY_DIR = "data_lake/grid_weather_daily"
 
-# --- Client Open-Meteo (cache + retry) ---
 CACHE_PATH = ".cache"
-CACHE_EXPIRE_AFTER_SEC = 86400        # cache persistant de 24h
+CACHE_EXPIRE_AFTER_SEC = 86400
 RETRY_COUNT = 5
 RETRY_BACKOFF_FACTOR = 1.5
 
@@ -39,14 +33,14 @@ PAST_DAYS = 7
 FORECAST_DAYS = 7
 
 # --- Génération de la grille de points (16 points = 4x4) par arrondissement ---
-GRID_COEFFICIENTS = [-0.9, -0.3, 0.3, 0.9]
-KM_PER_DEG_LAT = 111.1  # ~ nombre de km par degré de latitude
+# GRID_COEFFICIENTS = [-0.9, -0.3, 0.3, 0.9]
+# KM_PER_DEG_LAT = 111.1  # ~ nombre de km par degré de latitude
 
 # --- Cadence des requêtes (protection anti rate-limit) ---
 SLEEP_BETWEEN_REQUESTS_SEC = 3.0
 SLEEP_ON_ERROR_SEC = 10
 
 # --- Seuils métier ---
-RADIATION_SUNNY_THRESHOLD_W_M2 = 300     # >= : "Ensoleillé"
-RADIATION_CLOUDY_THRESHOLD_W_M2 = 150    # <  : "Non Ensoleillé"
-VISIBILITY_ALERT_KM = 5.0                # <= : alerte visibilité
+# RADIATION_SUNNY_THRESHOLD_W_M2 = 300     # >= : "Ensoleillé"
+# RADIATION_CLOUDY_THRESHOLD_W_M2 = 150    # <  : "Non Ensoleillé"
+# VISIBILITY_ALERT_KM = 5.0                # <= : alerte visibilité

@@ -3,5 +3,5 @@ dbt_weather_data_analysis:
   outputs:
     dev:
       type: duckdb
-      path: "./output/database_grid_analysis.duckdb"
+      path: "./output/weather_grid_analysis_database.duckdb"
       schema: 'main'
