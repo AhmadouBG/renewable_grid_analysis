@@ -43,10 +43,13 @@ FROM
     database_weather.raw.raw_hourly;
 
 SELECT DISTINCT
+    COUNT(NOM) AS total,
     NOM AS arrondissement_name
 FROM
     database_weather.main_seeds.senegal_arrondissements_location
-WHERE
+GROUP BY
+    NOM
+HAVING
     arrondissement_name NOT IN (
         SELECT DISTINCT
             arrondissement_name
@@ -60,17 +63,34 @@ FROM
     database_weather.main_seeds.senegal_arrondissements_location;
 
 SELECT
-    arrondissement_name,
-    COUNT(*) AS total
+    *
 FROM
     database_weather.stg_grid_points
-GROUP BY
-    arrondissement_name
-HAVING
-    arrondissement_name = 'saldé';
+WHERE
+    arrondissement_name = 'Saldé';
+
+SELECT
+    *
+FROM
+    database_weather.raw.extraction_failures;
 
 -- RAPPORT ANALYSES:
 -- Pas de cle primaire: (timestamp, arrondissement_name, point_grid_id) mais on peut la creer avec md5
 -- les arrondissements n'ont aucune valeur nulles (aucun null values)
 -- il y a pas de temperature negatif par heure ni de valeur superieur a 50 (ceux qui est normal)
 -- l'arrondissement 'saldé' n'est pas dans la table raw_daily and raw_hourly (ceux qui n'est pas normal)
+DESCRIBE database_weather.main_seeds.senegal_arrondissements_location;
+
+SELECT
+    arrondissement_name,
+    point_grid_id,
+    centroid_lat,
+    centroid_lon,
+    grid_lat,
+    grid_lon
+FROM
+    database_weather.stg_grid_points
+WHERE
+    arrondissement_name = 'Saldé'
+ORDER BY
+    point_grid_id;
