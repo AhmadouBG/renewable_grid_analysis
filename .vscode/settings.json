@@ -4,5 +4,14 @@
         "*.csv": "duckdb.dataFileViewer",
         "*.tsv": "duckdb.dataFileViewer",
         "*.xlsx": "duckdb.dataFileViewer"
-    }
+    },
+    "duckdb.databases": [
+        {
+            "alias": "weather_grid_analysis_database",
+            "type": "file",
+            "path": "c:\\Users\\Bamba\\Documents\\renewable_grid_analysis\\dbt_weather_data_analysis\\output\\weather_grid_analysis_database.duckdb",
+            "attached": false
+        }
+    ],
+    "duckdb.defaultDatabase": "weather_grid_analysis_database"
 }

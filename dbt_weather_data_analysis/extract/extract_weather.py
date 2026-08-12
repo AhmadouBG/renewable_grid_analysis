@@ -3,11 +3,11 @@ import openmeteo_requests
 import pandas as pd
 import requests_cache
 from retry_requests import retry
-
+import time
 import config
 
-con = duckdb.connect("weather_grid_analysis_database.duckdb")
-grid_df = con.execute("select * from main_staging.stg_grid_points").df()
+con = duckdb.connect("output/weather_grid_analysis_database.duckdb")
+grid_df = con.execute("select * from stg_grid_points").df()
 
 cache_session = requests_cache.CachedSession(config.CACHE_PATH, expire_after=config.CACHE_EXPIRE_AFTER_SEC)
 retry_session = retry(cache_session, retries=config.RETRY_COUNT, backoff_factor=config.RETRY_BACKOFF_FACTOR)
@@ -26,7 +26,12 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
         "past_days": config.PAST_DAYS,
         "forecast_days": config.FORECAST_DAYS,
     }
-    responses = openmeteo.weather_api(config.API_URL, params=params)
+    try:
+        responses = openmeteo.weather_api(config.API_URL, params=params)
+    except Exception as e:
+        print(f"⚠️ Arrondissement {arr_name} sauté temporairement (Erreur API) : {e}")
+        time.sleep(config.SLEEP_ON_ERROR_SEC)
+        continue
 
     for p_idx, response in enumerate(responses):
         point_id = group.iloc[p_idx]["point_grid_id"]
@@ -80,6 +85,8 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
             "wind_gusts_max_10m_kmh": daily.Variables(9).ValuesAsNumpy(),
             "shortwave_radiation_sum_mj_m2": daily.Variables(10).ValuesAsNumpy(),
         }))
+    time.sleep(config.SLEEP_BETWEEN_REQUESTS_SEC)
+
 
 final_hourly = pd.concat(hourly_raw, ignore_index=True)
 final_daily = pd.concat(daily_raw, ignore_index=True)

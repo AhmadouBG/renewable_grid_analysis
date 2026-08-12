@@ -3,9 +3,6 @@ config.py
 Configuration centralisée pour api_weather.py (ingestion météo par grille de points).
 """
 
-OUTPUT_HOURLY_DIR = "data_lake/grid_weather_hourly"
-OUTPUT_DAILY_DIR = "data_lake/grid_weather_daily"
-
 CACHE_PATH = ".cache"
 CACHE_EXPIRE_AFTER_SEC = 86400
 RETRY_COUNT = 5

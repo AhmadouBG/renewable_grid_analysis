@@ -13,6 +13,10 @@ WITH
             SQRT(sum_superf) / 2 AS offset_km
         FROM
             {{ref ('senegal_arrondissements_location')}}
+        WHERE
+            latitude IS NOT NULL
+            AND longitude IS NOT NULL
+            AND sum_superf > 0
     ),
     grid AS (
         SELECT

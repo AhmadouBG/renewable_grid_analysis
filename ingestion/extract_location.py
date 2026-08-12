@@ -9,6 +9,12 @@ data_path = git_repo_root / "data"
 geojson_file = data_path / "Limite_arrondissement_du_sénégal.geojson" 
 gdf = gpd.read_file(geojson_file)
 
+# Filtrer les géométries vides ou nulles et les superficies invalides
+gdf = gdf[gdf.geometry.notnull() & ~gdf.geometry.is_empty]
+if 'SUM_SUPERF' in gdf.columns:
+    gdf = gdf[gdf['SUM_SUPERF'] > 0]
+
+
 # 3. Calculer les vrais centres géographiques (Centroids)
 # On projette en EPSG:32628 pour un calcul de géométrie précis au Sénégal
 gdf_projected = gdf.to_crs(epsg=32628)
