@@ -1,5 +1,5 @@
 .venv/
 __pycache__/
 ingestion/data/
-test.py
 data_lake/
+dbt_weather_data_analysis/output/
