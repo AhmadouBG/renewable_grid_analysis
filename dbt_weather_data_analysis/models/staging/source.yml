@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    meta:
+      database: "output/weather_grid_analysis_database.duckdb"
+      schema: "raw"
+    tables:
+      - name: raw_hourly
+      - name: raw_daily

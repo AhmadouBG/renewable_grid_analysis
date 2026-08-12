@@ -24,7 +24,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 vars:
   km_per_deg_lat: 111.32   # config.KM_PER_DEG_LAT
-
+  radiation_sunny_threshold: 300
+  radiation_cloudy_threshold: 150
+  visibility_alert_km: 5.0
 seeds:
   dbt_weather_data_analysis:
     +schema: seeds
