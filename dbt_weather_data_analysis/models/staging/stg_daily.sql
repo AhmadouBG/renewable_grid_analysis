@@ -7,7 +7,9 @@ WITH
     ),
     transform_data_daily AS (
         SELECT
+            id_daily,
             date,
+            arrondissement_id,
             arrondissement_name,
             point_grid_id,
             latitude,

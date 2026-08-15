@@ -2,12 +2,280 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: stg_grid_points
+    description: "Grille de coordonnees par arrondissement dx/dy pour avoir des points dans les arrondissements"
     columns:
-      - name: id
+      - name: arrondissement_id
+        description: "The primary key for this table"
+        data_tests:
+          - not_null
+      - name: arrondissement_name
+        description: "The name of the arrondissement"
+        data_tests:
+          - not_null
+      - name: point_grid_id
+        description: "The primary key for this table"
+        data_tests:
+          - not_null
+      - name: grid_lat
+        description: "The latitude of the grid point"
+        data_tests:
+          - not_null
+      - name: grid_lon
+        description: "The longitude of the grid point"
+        data_tests:
+          - not_null
+      - name: centroid_lat
+        description: "The latitude of the centroid of the arrondissement"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: true
+      - name: centroid_lon
+        description: "The longitude of the centroid of the arrondissement"
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: double
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 0
+              strictly: true # Ensures values must be strictly less than 0
+          - not_null
+      - name: arrondissement_area_km2
+        description: "The area of the arrondissement in square kilometers"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: double
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: true
+      - name: arrondissement_perimeter_km2
+        description: "The perimeter of the arrondissement in kilometers"
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: double
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: true
+          - not_null
+
+
+  - name: stg_daily
+    description: "Daily weather data for each grid point in Senegal"
+    columns:
+      - name: id_daily
         description: "The primary key for this table"
         data_tests:
           - unique
+      - name: date
+        description: "The date of the weather data"
+        data_tests:
           - not_null
+      - name: arrondissement_name
+        description: "The name of the arrondissement"
+        data_tests:
+          - not_null
+      - name: point_grid_id
+        description: "The primary key for this table"
+        data_tests:
+          - not_null
+      - name: latitude
+        description: "The latitude of the grid point"
+        data_tests:
+          - not_null
+      - name: longitude
+        description: "The longitude of the grid point"
+        data_tests:
+          - not_null
+      - name: temp_max_2m
+        description: "The maximum daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+      - name: temp_mean_2m
+        description: "The mean daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+      - name: temp_min_2m
+        description: "The minimum daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+      - name: precipitation_sum_mm
+        description: "The sum of daily precipitation"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: rain_sum_mm
+        description: "The sum of daily rainfall"
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "<= precipitation_sum_mm"
+      - name: precipitation_probability_max_pct
+        description: "The maximum daily precipitation probability"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+              strictly: false
+      - name: sunshine_duration_sec
+        description: "The daily sum of sunshine duration"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: daylight_duration_sec
+        description: "The daily sum of daylight duration"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: wind_speed_max_10m_kmh
+        description: "The maximum daily wind speed at 10 meters"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: wind_gusts_max_10m_kmh
+        description: "The maximum daily wind gusts at 10 meters"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: shortwave_radiation_sum_mj_m2
+        description: "The daily sum of shortwave radiation"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: etat_ensoleillement
+        description: "The daily state of sunshine"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Ensoleillé','Non Ensoleillé','Éclaircies / Mixte']
+
+  - name: stg_hourly
+    description: "Hourly weather data for each grid point in Senegal"
+    columns:
+      - name: id_hourly
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+      - name: timestamp
+        description: "The date of the weather data"
+        data_tests:
+          - not_null
+      - name: arrondissement_name
+        description: "The name of the arrondissement"
+        data_tests:
+          - not_null
+      - name: point_grid_id
+        description: "The primary key for this table"
+        data_tests:
+          - not_null
+      - name: latitude
+        description: "The latitude of the grid point"
+        data_tests:
+          - not_null
+      - name: longitude
+        description: "The longitude of the grid point"
+        data_tests:
+          - not_null
+      - name: temperature_2m
+        description: "The maximum daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false # >= 0
+      - name: cloud_cover_pct
+        description: "The mean daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+              strictly: false # >= 0 and <= 100
+      - name: direct_radiation_w_m2
+        description: "The minimum daily air temperature at 2 meters above ground"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false # > 0
+      - name: shortwave_radiation_w_m2
+        description: "The sum of daily precipitation"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false # > 0
+      - name: wind_speed_80m_kmh
+        description: "The sum of daily rainfall"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: wind_direction_80m_deg
+        description: "The maximum daily precipitation probability"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 360
+              strictly: false # >= 0 and <= 360
+      - name: precipitation_mm
+        description: "The daily sum of sunshine duration"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: visibility_m
+        description: "The daily sum of daylight duration"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: true
+      - name: visibility_km
+        description: "The maximum daily wind speed at 10 meters"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: true
+      - name: weather_code_wmo
+        description: "The maximum daily wind gusts at 10 meters"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+      - name: etat_ensoleillement
+        description: "The daily state of sunshine"
+        data_tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Ensoleillé','Non Ensoleillé','Éclaircies / Mixte']
+      
+      
+      
+        
+      
+
 

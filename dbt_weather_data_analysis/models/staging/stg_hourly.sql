@@ -7,7 +7,9 @@ WITH
     ),
     transform_data_hourly AS (
         SELECT
+            id_hourly,
             timestamp,
+            arrondissement_id,
             arrondissement_name,
             point_grid_id,
             latitude,

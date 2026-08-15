@@ -18,7 +18,7 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 
 con.execute("create schema if not exists raw")
 con.execute("""create table if not exists raw.raw_hourly (
-    timestamp timestamp, arrondissement_name varchar, point_grid_id int,
+    id_hourly int, timestamp timestamp,arrondissement_id int, arrondissement_name varchar, point_grid_id int,
     latitude double, longitude double, temperature_2m double,
     cloud_cover_pct double, direct_radiation_w_m2 double,
     shortwave_radiation_w_m2 double, wind_speed_80m_kmh double,
@@ -26,7 +26,7 @@ con.execute("""create table if not exists raw.raw_hourly (
     visibility_m double, weather_code_wmo double
 )""")
 con.execute("""create table if not exists raw.raw_daily (
-    date date, arrondissement_name varchar, point_grid_id int,
+    id_daily int, date date, arrondissement_id int, arrondissement_name varchar, point_grid_id int,
     latitude double, longitude double, temp_max_2m double,
     temp_mean_2m double, temp_min_2m double, precipitation_sum_mm double,
     rain_sum_mm double, precipitation_probability_max_pct double,
@@ -35,10 +35,21 @@ con.execute("""create table if not exists raw.raw_daily (
     shortwave_radiation_sum_mj_m2 double
 )""")
 con.execute("""create table if not exists raw.extraction_failures (
-    arrondissement_name varchar, error varchar, run_ts timestamp
+    id_failure int, arrondissement_id int, arrondissement_name varchar, error varchar, run_ts timestamp
 )""")
 
-for arr_name, group in grid_df.groupby("arrondissement_name"):
+# Query current max IDs or initialize them
+res_h = con.execute("select max(id_hourly) from raw.raw_hourly").fetchone()[0]
+current_id_hourly = (res_h if res_h is not None else 0) + 1
+
+res_d = con.execute("select max(id_daily) from raw.raw_daily").fetchone()[0]
+current_id_daily = (res_d if res_d is not None else 0) + 1
+
+res_f = con.execute("select max(id_failure) from raw.extraction_failures").fetchone()[0]
+current_id_failure = (res_f if res_f is not None else 0) + 1
+
+for arr_id, group in grid_df.groupby("arrondissement_id"):
+    arr_name = group.iloc[0]["arrondissement_name"]
     try:
         params = {
             "latitude": group["grid_lat"].tolist(),
@@ -65,8 +76,9 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
                 freq=pd.Timedelta(seconds=hourly.Interval()),
                 inclusive="left",
             )
-            arr_hourly.append(pd.DataFrame({
+            df_h = pd.DataFrame({
                 "timestamp": h_dates,
+                "arrondissement_id": arr_id,
                 "arrondissement_name": arr_name,
                 "point_grid_id": point_id,
                 "latitude": response.Latitude(),
@@ -80,7 +92,10 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
                 "precipitation_mm": hourly.Variables(6).ValuesAsNumpy(),
                 "visibility_m": hourly.Variables(7).ValuesAsNumpy(),
                 "weather_code_wmo": hourly.Variables(8).ValuesAsNumpy(),
-            }))
+            })
+            df_h.insert(0, "id_hourly", range(current_id_hourly, current_id_hourly + len(df_h)))
+            current_id_hourly += len(df_h)
+            arr_hourly.append(df_h)
 
             daily = response.Daily()
             d_dates = pd.date_range(
@@ -89,8 +104,9 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
                 freq=pd.Timedelta(seconds=daily.Interval()),
                 inclusive="left",
             )
-            arr_daily.append(pd.DataFrame({
+            df_d = pd.DataFrame({
                 "date": d_dates.date,
+                "arrondissement_id": arr_id,
                 "arrondissement_name": arr_name,
                 "point_grid_id": point_id,
                 "latitude": response.Latitude(),
@@ -106,21 +122,25 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
                 "wind_speed_max_10m_kmh": daily.Variables(8).ValuesAsNumpy(),
                 "wind_gusts_max_10m_kmh": daily.Variables(9).ValuesAsNumpy(),
                 "shortwave_radiation_sum_mj_m2": daily.Variables(10).ValuesAsNumpy(),
-            }))
+            })
+            df_d.insert(0, "id_daily", range(current_id_daily, current_id_daily + len(df_d)))
+            current_id_daily += len(df_d)
+            arr_daily.append(df_d)
 
         # write THIS arrondissement immediately
         arr_hourly_df = pd.concat(arr_hourly, ignore_index=True)
         arr_daily_df = pd.concat(arr_daily, ignore_index=True)
         con.execute("insert into raw.raw_hourly select * from arr_hourly_df")
         con.execute("insert into raw.raw_daily select * from arr_daily_df")
-        print(f"✅ {arr_name} : {len(arr_hourly_df)} lignes horaires écrites")
+        print(f"✅ {arr_name} (ID: {arr_id}) : {len(arr_hourly_df)} lignes horaires écrites")
 
     except Exception as e:
-        print(f"⚠️ {arr_name} sauté : {e}")
+        print(f"⚠️ {arr_id} sauté : {e}")
         con.execute(
-            "insert into raw.extraction_failures values (?, ?, ?)",
-            [arr_name, str(e), pd.Timestamp.now()]
+            "insert into raw.extraction_failures values (?, ?, ?, ?, ?)",
+            [current_id_failure, arr_id, arr_name, str(e), pd.Timestamp.now()]
         )
+        current_id_failure += 1
         time.sleep(config.SLEEP_ON_ERROR_SEC)
         continue
 

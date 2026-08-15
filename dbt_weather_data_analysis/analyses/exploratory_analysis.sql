@@ -1,52 +1,69 @@
+-- SQL queries investigations
 SELECT
     *
 FROM
-    database_weather.raw.raw_hourly
+    weather_grid_analysis_database.raw.raw_hourly
 LIMIT
     5;
 
 SELECT
     *
 FROM
-    database_weather.raw.raw_daily
+    weather_grid_analysis_database.raw.raw_daily
 LIMIT
     5;
 
+SELECT
+    *
+FROM
+    weather_grid_analysis_database.stg_grid_points;
+
+SELECT
+    *
+FROM
+    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location;
+
 -- nombre total d'enregistrements
 SELECT
     COUNT(*) AS total
 FROM
-    database_weather.raw.raw_hourly;
+    weather_grid_analysis_database.raw.raw_hourly;
 
 -- nombre total d'enregistrements
 SELECT
     COUNT(*) AS total
 FROM
-    database_weather.raw.raw_daily;
+    weather_grid_analysis_database.raw.raw_daily;
 
 -- verifier les colonnes et leurs types
-DESCRIBE database_weather.raw.raw_hourly;
+DESCRIBE weather_grid_analysis_database.raw.raw_hourly;
 
 -- verifier les colonnes et leurs types
-DESCRIBE database_weather.raw.raw_daily;
+DESCRIBE weather_grid_analysis_database.raw.raw_daily;
+
+--
+DESCRIBE weather_grid_analysis_database.main_seeds.senegal_arrondissements_location;
+
+--
+DESCRIBE weather_grid_analysis_database.stg_grid_points;
 
 -- NUMBER OF POINT GRID
 SELECT
     COUNT(DISTINCT point_grid_id) AS total
 FROM
-    database_weather.raw.raw_hourly;
+    weather_grid_analysis_database.raw.raw_hourly;
 
 -- NOMBRE OF ARRONDISSEMENT
 SELECT
     COUNT(DISTINCT arrondissement_name) AS total
 FROM
-    database_weather.raw.raw_hourly;
+    weather_grid_analysis_database.raw.raw_hourly;
 
 SELECT DISTINCT
     COUNT(NOM) AS total,
     NOM AS arrondissement_name
 FROM
-    database_weather.main_seeds.senegal_arrondissements_location
+    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location
 GROUP BY
     NOM
 HAVING
@@ -54,43 +71,38 @@ HAVING
         SELECT DISTINCT
             arrondissement_name
         FROM
-            database_weather.raw.raw_hourly
+            weather_grid_analysis_database.raw.raw_hourly
     );
 
 SELECT
     COUNT(*) AS total
 FROM
-    database_weather.main_seeds.senegal_arrondissements_location;
+    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location;
 
 SELECT
-    *
+    COUNT(*)
 FROM
-    database_weather.stg_grid_points
-WHERE
-    arrondissement_name = 'Saldé';
-
-SELECT
-    *
-FROM
-    database_weather.raw.extraction_failures;
+    weather_grid_analysis_database.stg_grid_points;
 
 -- RAPPORT ANALYSES:
--- Pas de cle primaire: (timestamp, arrondissement_name, point_grid_id) mais on peut la creer avec md5
+-- Pas de cle primaire: (raw_hourly, raw_daily)
 -- les arrondissements n'ont aucune valeur nulles (aucun null values)
 -- il y a pas de temperature negatif par heure ni de valeur superieur a 50 (ceux qui est normal)
--- l'arrondissement 'saldé' n'est pas dans la table raw_daily and raw_hourly (ceux qui n'est pas normal)
-DESCRIBE database_weather.main_seeds.senegal_arrondissements_location;
-
+-- l'arrondissement 'saldé' n'est pas dans les tables
 SELECT
-    arrondissement_name,
+    arrondissement_id,
     point_grid_id,
-    centroid_lat,
-    centroid_lon,
     grid_lat,
     grid_lon
 FROM
-    database_weather.stg_grid_points
-WHERE
-    arrondissement_name = 'Saldé'
-ORDER BY
-    point_grid_id;
+    weather_grid_analysis_database.stg_grid_points;
+
+SELECT
+    FID,
+    NOM,
+    SUM_SUPERF,
+    SHAPE_LENG,
+    latitude,
+    longitude
+FROM
+    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location
