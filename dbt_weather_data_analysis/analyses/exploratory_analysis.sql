@@ -105,4 +105,17 @@ SELECT
     latitude,
     longitude
 FROM
-    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location
+    weather_grid_analysis_database.main_seeds.senegal_arrondissements_location;
+
+-- describe the table kpi_generation_potential
+select
+    grid_point_id,
+    arrondissement_id,
+    date_id,
+    hour_id,
+    solar_score,
+    wind_score,
+    kpi_potential_score
+from weather_grid_analysis_database.main.kpi_generation_potential
+where grid_point_id = 'ea66c06c1e1c05fa9f1aa39d98dc5bc1'
+order by date_id, hour_id;

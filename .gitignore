@@ -1,5 +1,4 @@
 .venv/
 __pycache__/
-ingestion/data/
 data_lake/
 dbt_weather_data_analysis/output/

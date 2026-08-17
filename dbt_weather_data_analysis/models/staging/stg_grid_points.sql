@@ -22,6 +22,7 @@ WITH
     grid AS (
         SELECT
             b.arrondissement_id,
+            b.arrondissement_name,
             row_number() over (
                 PARTITION BY
                     b.arrondissement_id

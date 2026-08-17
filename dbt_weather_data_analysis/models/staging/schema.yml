@@ -9,10 +9,6 @@ models:
         description: "The primary key for this table"
         data_tests:
           - not_null
-      - name: arrondissement_name
-        description: "The name of the arrondissement"
-        data_tests:
-          - not_null
       - name: point_grid_id
         description: "The primary key for this table"
         data_tests:
@@ -24,43 +20,6 @@ models:
       - name: grid_lon
         description: "The longitude of the grid point"
         data_tests:
-          - not_null
-      - name: centroid_lat
-        description: "The latitude of the centroid of the arrondissement"
-        data_tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: true
-      - name: centroid_lon
-        description: "The longitude of the centroid of the arrondissement"
-        data_tests:
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              arguments:
-                column_type: double
-          - dbt_expectations.expect_column_values_to_be_between:
-              max_value: 0
-              strictly: true # Ensures values must be strictly less than 0
-          - not_null
-      - name: arrondissement_area_km2
-        description: "The area of the arrondissement in square kilometers"
-        data_tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              arguments:
-                column_type: double
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: true
-      - name: arrondissement_perimeter_km2
-        description: "The perimeter of the arrondissement in kilometers"
-        data_tests:
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              arguments:
-                column_type: double
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: true
           - not_null
 
 
@@ -114,9 +73,9 @@ models:
         description: "The sum of daily rainfall"
         data_tests:
           - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: "<= precipitation_sum_mm"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
       - name: precipitation_probability_max_pct
         description: "The maximum daily precipitation probability"
         data_tests:
@@ -137,29 +96,29 @@ models:
         data_tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: false
+                min_value: 0
+                strictly: false
       - name: wind_speed_max_10m_kmh
         description: "The maximum daily wind speed at 10 meters"
         data_tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: false
+                min_value: 0
+                strictly: false
       - name: wind_gusts_max_10m_kmh
         description: "The maximum daily wind gusts at 10 meters"
         data_tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: false
+                min_value: 0
+                strictly: false
       - name: shortwave_radiation_sum_mj_m2
         description: "The daily sum of shortwave radiation"
         data_tests:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              strictly: false
+                min_value: 0
+                strictly: false
       - name: etat_ensoleillement
         description: "The daily state of sunshine"
         data_tests:

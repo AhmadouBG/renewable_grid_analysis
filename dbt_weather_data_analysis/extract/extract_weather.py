@@ -34,6 +34,13 @@ con.execute("""create table if not exists raw.raw_daily (
     wind_speed_max_10m_kmh double, wind_gusts_max_10m_kmh double,
     shortwave_radiation_sum_mj_m2 double
 )""")
+
+# --- table setup, alongside your existing raw_hourly/raw_daily/extraction_failures ---
+con.execute("""create table if not exists raw.raw_air_quality (
+    timestamp timestamp, arrondissement_name varchar, point_grid_id int,
+    latitude double, longitude double,
+    pm10 double, pm2_5 double, dust double
+)""")
 con.execute("""create table if not exists raw.extraction_failures (
     id_failure int, arrondissement_id int, arrondissement_name varchar, error varchar, run_ts timestamp
 )""")

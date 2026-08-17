@@ -36,8 +36,10 @@ FORECAST_DAYS = 7
 # --- Cadence des requêtes (protection anti rate-limit) ---
 SLEEP_BETWEEN_REQUESTS_SEC = 3.0
 SLEEP_ON_ERROR_SEC = 10
+# config.py — add these
 
-# --- Seuils métier ---
-# RADIATION_SUNNY_THRESHOLD_W_M2 = 300     # >= : "Ensoleillé"
-# RADIATION_CLOUDY_THRESHOLD_W_M2 = 150    # <  : "Non Ensoleillé"
-# VISIBILITY_ALERT_KM = 5.0                # <= : alerte visibilité
+AIR_QUALITY_API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
+
+AIR_QUALITY_HOURLY_VARIABLES = [
+    "pm10", "pm2_5", "dust"
+]

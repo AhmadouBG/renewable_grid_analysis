@@ -19,7 +19,7 @@ FROM
     {{ref ('stg_hourly')}} f
     JOIN {{ref ('dim_grid_point')}} g ON f.arrondissement_id = g.arrondissement_id
     AND f.point_grid_id = g.point_grid_id
-    JOIN {{ref ('dim_date')}} d ON cast(f.timestamp AS date) = d.date
+    JOIN {{ref ('dim_daily')}} d ON cast(f.timestamp AS date) = d.date
     JOIN {{ref ('dim_hourly')}} h ON extract (
         hour
         FROM

@@ -8,3 +8,4 @@ sources:
     tables:
       - name: raw_hourly
       - name: raw_daily
+      - name: raw_air_quality

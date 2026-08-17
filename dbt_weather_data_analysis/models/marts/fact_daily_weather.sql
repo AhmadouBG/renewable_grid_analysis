@@ -18,4 +18,4 @@ FROM
     {{ref ('stg_daily')}} f
     JOIN {{ref ('dim_grid_point')}} g ON f.arrondissement_id = g.arrondissement_id
     AND f.point_grid_id = g.point_grid_id
-    JOIN {{ref ('dim_date')}} d ON f.date = d.date
+    JOIN {{ref ('dim_daily')}} d ON f.date = d.date
