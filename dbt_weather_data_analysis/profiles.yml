@@ -5,3 +5,4 @@ dbt_weather_data_analysis:
       type: duckdb
       path: "./output/weather_grid_analysis_database.duckdb"
       schema: 'main'
+      threads: 1 
