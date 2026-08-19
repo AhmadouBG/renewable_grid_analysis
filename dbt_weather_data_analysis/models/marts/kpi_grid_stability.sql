@@ -1,8 +1,8 @@
 -- models/marts/kpi_grid_stability.sql
 {{ config(materialized='table') }}
 
-WITH hourly AS (
-    SELECT
+with hourly as (
+    select
         f.grid_point_id,
         g.arrondissement_id,
         g.arrondissement_name,
@@ -11,52 +11,72 @@ WITH hourly AS (
         h.hour,
         f.shortwave_radiation_w_m2,
         f.precipitation_mm
-    FROM {{ ref('fact_hourly_weather') }} f
-    JOIN {{ ref('dim_grid_point') }} g ON f.grid_point_id = g.grid_point_id
-    JOIN {{ ref('dim_hourly') }} h ON f.hour_id = h.hour_id
+    from {{ ref('fact_hourly_weather') }} f
+    join {{ ref('dim_grid_point') }} g on f.grid_point_id = g.grid_point_id
+    join {{ ref('dim_hourly') }} h on f.hour_id = h.hour_id
+    where h.hour between {{ var('peak_hour_start') }} and {{ var('peak_hour_end') }}
 ),
 
-peak_baseline AS (
-    --REFERENCE: expected clear-sky radiation at peak hour (STC-adjacent ceiling)
-    SELECT
-        arrondissement_id,
-        date_id,
-        max(shortwave_radiation_w_m2) AS peak_radiation_w_m2
-    FROM hourly
-    WHERE hour BETWEEN {{ var('peak_hour_start') }} AND {{ var('peak_hour_end') }}
-    GROUP BY 1, 2
+drop_calc as (
+    select
+        *,
+        {{ var('clear_sky_peak_radiation_w_m2') }} as clear_sky_reference_w_m2,
+
+        least(100.0, greatest(0.0,
+            ({{ var('clear_sky_peak_radiation_w_m2') }} - shortwave_radiation_w_m2)
+            / {{ var('clear_sky_peak_radiation_w_m2') }} * 100
+        )) as pct_drop_from_clear_sky
+
+    from hourly
 ),
 
-drop_calc AS (
-    SELECT
-        h.*,
-        p.peak_radiation_w_m2,
-        CASE
-            WHEN p.peak_radiation_w_m2 > 0 THEN
-                (p.peak_radiation_w_m2 - h.shortwave_radiation_w_m2) / p.peak_radiation_w_m2 * 100
-            ELSE 0
-        END as pct_drop_from_peak
-    FROM hourly h
-    JOIN peak_baseline p
-        ON h.arrondissement_id = p.arrondissement_id
-        AND h.date_id = p.date_id
-    WHERE h.hour BETWEEN {{ var('peak_hour_start') }} AND {{ var('peak_hour_end') }}
+flagged as (
+    select
+        *,
+        case when pct_drop_from_clear_sky > {{ var('grid_risk_threshold_pct') }} then 1 else 0 end
+            as grid_stability_risk
+    from drop_calc
+),
+
+persistence as (
+    select
+        *,
+        -- FIX: partition by grid_point_id, not just arrondissement_id
+        hour - row_number() over (
+            partition by grid_point_id, date_id, grid_stability_risk
+            order by hour
+        ) as risk_grp
+    from flagged
+),
+
+persistence_counted as (
+    select
+        *,
+        count(*) over (partition by grid_point_id, date_id, risk_grp) as consecutive_risk_hours
+    from persistence
+    where grid_stability_risk = 1
 )
 
-SELECT
-    grid_point_id,
-    arrondissement_id,
-    arrondissement_name,
-    date_id,
-    hour_id,
-    round(pct_drop_from_peak, 1) AS pct_drop_from_peak,
+select
+    f.grid_point_id,
+    f.arrondissement_id,
+    f.arrondissement_name,
+    f.date_id,
+    f.hour_id,
+    f.hour,
+    round(f.shortwave_radiation_w_m2, 1)   as shortwave_radiation_w_m2,
+    f.clear_sky_reference_w_m2,
+    round(f.pct_drop_from_clear_sky, 1)    as pct_drop_from_clear_sky,
+    f.grid_stability_risk,
 
-    CASE WHEN pct_drop_from_peak > {{ var('grid_risk_threshold_pct') }} THEN 1 
-        ELSE 0 
-    END AS grid_stability_risk,
+    coalesce(
+        (select 1
+         from persistence_counted pc
+         where pc.grid_point_id = f.grid_point_id     -- FIX: added
+           and pc.date_id = f.date_id
+           and pc.hour_id = f.hour_id
+           and pc.consecutive_risk_hours >= {{ var('grid_risk_persistence_hours') }}
+        ), 0
+    ) as generator_activation_recommended
 
-    CASE WHEN pct_drop_from_peak > {{ var('grid_risk_threshold_pct') }} THEN 1 
-        ELSE 0 
-    END AS generator_activation_recommended
-
-FROM drop_calc
+from flagged f

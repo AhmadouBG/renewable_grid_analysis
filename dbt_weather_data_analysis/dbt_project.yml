@@ -41,9 +41,9 @@ vars:
   pv_tstc_c: 25                             # T_STC
   
    # Harmattan / dust
-  harmattan_pm10_light: 50      # µg/m³ — WHO-adjacent light dust threshold
-  harmattan_pm10_moderate: 150
-  harmattan_pm10_severe: 300
+  harmattan_dust_light: 50      # µg/m³ — WHO-adjacent light dust threshold
+  harmattan_dust_moderate: 150
+  harmattan_dust_severe: 300
 
   # Preventive maintenance window
   maintenance_max_wind_kmh: 20
@@ -55,6 +55,10 @@ vars:
   grid_risk_threshold_pct: 40          # X% — adjust to your ops team's real risk tolerance
   solar_coverage_threshold_w_m2: 200   # minimum irradiance counted as "producing"
   
+  # Grid stability: independent clear-sky reference (NOT derived from observed data)
+  clear_sky_peak_radiation_w_m2: 900   # realistic clear-sky peak for Senegal, per Ndiaye et al. 2025 simulations
+  grid_risk_persistence_hours: 2       # consecutive risky hours needed before recommending generator activation
+
 seeds:
   dbt_weather_data_analysis:
     +schema: seeds
