@@ -33,9 +33,21 @@ DESCRIBE weather_grid_analysis_database.main.kpi_preventive_maintenance_window;
 DESCRIBE weather_grid_analysis_database.main.kpi_generation_potential;
 DESCRIBE weather_grid_analysis_database.main.kpi_grid_stability;
 
-SELECT grid_point_id, DATE_ID, HOUR_ID,harmattan_risk_score FROM weather_grid_analysis_database.main.kpi_harmattan_risk 
-WHERE grid_point_id = 'ea66c06c1e1c05fa9f1aa39d98dc5bc1'
-ORDER BY date_id, hour_id;
+select
+    timestamp, arrondissement_name, point_grid_id,
+    count(*) as n
+from weather_grid_analysis_database.main.stg_air_quality
+group by 1, 2, 3
+having count(*) > 1
+order by n desc
+limit 10;
 
+select arrondissement_id, arrondissement_name, count(*)
+from weather_grid_analysis_database.main.dim_grid_point
+where arrondissement_name = 'Paoscoto'
+group by 1, 2;
 
-
+select fid, nom, count(*)
+from weather_grid_analysis_database.main_seeds.senegal_arrondissements_location
+where nom = 'Paoscoto'
+group by 1, 2;

@@ -59,6 +59,11 @@ vars:
   clear_sky_peak_radiation_w_m2: 900   # realistic clear-sky peak for Senegal, per Ndiaye et al. 2025 simulations
   grid_risk_persistence_hours: 2       # consecutive risky hours needed before recommending generator activation
 
+  # KPI: capacity sizing (calibrated from Ten Merina: 30MW / 92,160 panels / 44 ha)
+  panels_per_ha: 2094.5
+  capacity_kw_per_ha: 681.8
+  default_solar_land_pct: 0.01
+  
 seeds:
   dbt_weather_data_analysis:
     +schema: seeds

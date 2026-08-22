@@ -11,4 +11,5 @@ select
     s.arrondissement_id
 from {{ source('raw', 'raw_air_quality') }} a
 join {{ ref('stg_grid_points') }} s
-    on a.point_grid_id = s.point_grid_id
+    on trim(a.arrondissement_name) = s.arrondissement_name
+    and a.point_grid_id = s.point_grid_id

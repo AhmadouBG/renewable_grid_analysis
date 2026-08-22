@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: dim_grid_point
+    description: "One row per grid point (16 per arrondissement). Denormalized — carries arrondissement_name directly, no separate arrondissement dimension."
+    columns:
+      - name: grid_point_id
+        tests: [unique, not_null]
+      - name: arrondissement_id
+        tests: [not_null]
+      - name: arrondissement_name
+        tests: [not_null]
+      - name: point_grid_id
+        tests: [not_null]
+      - name: grid_lat
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 12, max_value: 17}   # Senegal's approx latitude range
+      - name: grid_lon
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: -18, max_value: -11}  # Senegal's approx longitude range
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [arrondissement_id, point_grid_id]
+
+  - name: dim_date
+    columns:
+      - name: date_id
+        tests: [unique, not_null]
+      - name: date
+        tests: [unique, not_null]
+
+  - name: dim_hourly
+    columns:
+      - name: hour_id
+        tests: [unique, not_null]
+      - name: hour
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 23
+              strictly: false

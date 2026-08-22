@@ -1,0 +1,99 @@
+models:
+  - name: kpi_generation_potential
+    description: >
+      Solar/wind generation potential KPI. Solar formula (performance ratio,
+      NOCT-based cell temperature) sourced from Ndiaye et al. 2025 (Solar Energy
+      Advances), validated against observed production at Ten Merina plant only
+      (2018-2021). Temperature coefficient (gamma) and NOCT are generic
+      poly-crystalline Si properties, not Ten-Merina-specific, but the paper's
+      own validation is geographically limited to one site — treat solar_output_kwh_per_kw
+      as a physically-grounded estimate, not a site-validated one, for
+      arrondissements outside Thiès region.
+    columns:
+      - name: grid_point_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_grid_point')
+                field: grid_point_id
+      - name: solar_score
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 100}
+      - name: wind_score
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 100}
+      - name: kpi_potential_score
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 100}
+      - name: performance_ratio
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 1.1}
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id, hour_id]
+
+  - name: kpi_grid_stability
+    description: "Grain: one row per grid point per peak-window hour. Fixed clear-sky baseline (900 W/m2), not self-referential."
+    columns:
+      - name: pct_drop_from_clear_sky
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 100}
+      - name: grid_stability_risk
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+      - name: generator_activation_recommended
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id, hour_id]
+
+  - name: kpi_harmattan_risk
+    description: "Grain: one row per grid point per hour. Dust risk score, cross-validated against visibility."
+    columns:
+      - name: harmattan_risk_score
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 100}
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id, hour_id]
+
+  - name: kpi_preventive_maintenance_window
+    description: "Grain: one row per arrondissement per hour (aggregated across grid points before thresholding — NOT per grid point)."
+    columns:
+      - name: arrondissement_id
+        tests: [not_null]
+      - name: is_ideal_hour
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [arrondissement_id, date_id, hour_id]
+
+  - name: kpi_preventive_maintenance_window_daily
+    description: "Grain: one row per arrondissement per contiguous ideal-hour window per day."
+    columns:
+      - name: window_length_hours
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 1, max_value: 24}

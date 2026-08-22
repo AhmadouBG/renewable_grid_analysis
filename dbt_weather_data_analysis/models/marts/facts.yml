@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: fact_hourly_weather
+    description: "Grain: one row per grid point per hour."
+    columns:
+      - name: grid_point_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_grid_point')
+                field: grid_point_id
+      - name: date_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_id
+      - name: hour_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_hourly')
+                field: hour_id
+      - name: shortwave_radiation_w_m2
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 1400}   # allow some headroom above 1000 STC for real extremes
+      - name: wind_speed_80m_kmh
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 250}
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id, hour_id]
+
+  - name: fact_daily_weather
+    description: "Grain: one row per grid point per day."
+    columns:
+      - name: grid_point_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_grid_point')
+                field: grid_point_id
+      - name: date_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_id
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id]
+
+  - name: fact_hourly_air_quality
+    description: "Grain: one row per grid point per hour. Sourced from Open-Meteo Air Quality API, independent extraction from weather."
+    columns:
+      - name: grid_point_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_grid_point')
+                field: grid_point_id
+      - name: date_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_id
+      - name: hour_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_hourly')
+                field: hour_id
+      - name: pm10
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments: {min_value: 0, max_value: 2000}   # generous ceiling for extreme Harmattan events
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [grid_point_id, date_id, hour_id]
