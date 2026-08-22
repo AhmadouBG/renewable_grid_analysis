@@ -137,7 +137,19 @@ for arr_id, group in grid_df.groupby("arrondissement_id"):
         # write THIS arrondissement immediately
         arr_hourly_df = pd.concat(arr_hourly, ignore_index=True)
         arr_daily_df = pd.concat(arr_daily, ignore_index=True)
+        con.execute("""
+            delete from raw.raw_hourly
+            where (arrondissement_name, point_grid_id, timestamp) in (
+                select arrondissement_name, point_grid_id, timestamp from arr_hourly_df
+            )
+        """)
         con.execute("insert into raw.raw_hourly select * from arr_hourly_df")
+        con.execute("""
+            delete from raw.raw_daily
+            where (arrondissement_name, point_grid_id, date) in (
+                select arrondissement_name, point_grid_id, date from arr_daily_df
+            )
+        """)
         con.execute("insert into raw.raw_daily select * from arr_daily_df")
         print(f"✅ {arr_name} (ID: {arr_id}) : {len(arr_hourly_df)} lignes horaires écrites")
 
