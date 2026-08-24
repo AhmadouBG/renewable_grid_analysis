@@ -2,54 +2,68 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 
+DBT_CMD = "cd /opt/airflow/dbt_weather_data_analysis && dbt"
+
 default_args = {
     "retries": 2,
     "retry_delay": timedelta(minutes=5),
 }
 
-DUCKDB_OUTPUT_DIR = "/opt/airflow/dbt_weather_data_analysis/output"
-DUCKDB_PATH = f"{DUCKDB_OUTPUT_DIR}/weather_grid_analysis_database.duckdb"
-
 with DAG(
-    "weather_pipeline",
-    schedule="0 */1 * * *",   # every hour
-    start_date=datetime(2026, 8, 24),
+    "weather_pipeline_ingest",
+    schedule_interval="0 6 */2 * *",   # every 2 days at 6am
+    start_date=datetime(2026, 8, 1),
     catchup=False,
     default_args=default_args,
+    tags=["scheduled"],
+    description="Recurring ingest: extract new weather/air-quality data, upsert into facts, refresh KPIs.",
 ) as dag:
-
-    # Ensure the output directory and DuckDB file are writable by the Airflow user.
-    # Docker on Windows mounts volumes owned by root; this task fixes permissions
-    # so subsequent tasks can open/create the DuckDB file without "Permission denied".
-    fix_permissions = BashOperator(
-        task_id="fix_permissions",
-        bash_command=(
-            f"mkdir -p {DUCKDB_OUTPUT_DIR} && "
-            f"chmod -R 777 {DUCKDB_OUTPUT_DIR}"
-        ),
-        # Run as root to be able to chmod; uses docker exec override via env var.
-        # If the container doesn't allow root, remove the user override and rely
-        # on the AIRFLOW_UID being set correctly in .env instead.
-    )
 
     extract_weather = BashOperator(
         task_id="extract_weather",
-        bash_command=f"python /opt/airflow/dbt_weather_data_analysis/extract/extract_weather.py",
+        bash_command="python /opt/airflow/extract/extract_weather.py",
     )
 
     extract_air_quality = BashOperator(
         task_id="extract_air_quality",
-        bash_command=f"python /opt/airflow/dbt_weather_data_analysis/extract/extract_air_quality.py",
+        bash_command="python /opt/airflow/extract/extract_air_quality.py",
     )
 
-    dbt_run = BashOperator(
-        task_id="dbt_run",
-        bash_command="cd /opt/airflow/dbt_weather_data_analysis && dbt run --profiles-dir .",
+    dbt_staging = BashOperator(
+        task_id="dbt_staging",
+        bash_command=f"{DBT_CMD} run --select stg_hourly stg_daily stg_air_quality --profiles-dir .",
+    )
+
+    dbt_build_dims = BashOperator(
+        task_id="dbt_build_dims",
+        bash_command=f"{DBT_CMD} run --select dim_date dim_hourly --profiles-dir .",
+    )
+
+    dbt_facts = BashOperator(
+        task_id="dbt_facts",
+        bash_command=f"{DBT_CMD} run --select fact_hourly_weather fact_daily_weather fact_hourly_air_quality --profiles-dir .",
+    )
+
+    dbt_marts = BashOperator(
+        task_id="dbt_marts",
+        bash_command=(
+            f"{DBT_CMD} run --exclude stg_grid_points dim_grid_point "
+            f"stg_hourly stg_daily stg_air_quality dim_date dim_hourly "
+            f"fact_hourly_weather fact_daily_weather fact_hourly_air_quality --profiles-dir ."
+        ),
     )
 
     dbt_test = BashOperator(
         task_id="dbt_test",
-        bash_command="cd /opt/airflow/dbt_weather_data_analysis && dbt test --profiles-dir .",
+        bash_command=f"{DBT_CMD} test --profiles-dir .",
     )
 
-    fix_permissions >> extract_weather >> extract_air_quality >> dbt_run >> dbt_test
+    (
+        extract_weather
+        >> extract_air_quality
+        >> dbt_staging
+        >> dbt_build_dims
+        >> dbt_facts
+        >> dbt_marts
+        >> dbt_test
+    )
