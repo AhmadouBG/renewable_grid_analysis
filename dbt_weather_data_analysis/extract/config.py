@@ -46,6 +46,6 @@ AIR_QUALITY_HOURLY_VARIABLES = [
 ]
 
 BASE_DIR = Path("/opt/airflow")
-DUCKDB_PATH = BASE_DIR / "output" / "weather_grid_analysis_database.duckdb"
+DUCKDB_PATH = BASE_DIR / "dbt_weather_data_analysis" /"output" / "weather_grid_analysis_database.duckdb"
 CACHE_PATH = str(BASE_DIR / ".cache")
 LOCATION_FILE = BASE_DIR / "dbt_weather_data_analysis" / "seeds" / "senegal_arrondissements_location.csv"

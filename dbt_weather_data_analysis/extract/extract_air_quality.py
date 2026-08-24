@@ -6,7 +6,8 @@ from retry_requests import retry
 import time
 import config
 
-con = duckdb.connect("output/weather_grid_analysis_database.duckdb")
+con = duckdb.connect(str(config.DUCKDB_PATH))
+
 grid_df = con.execute("select * from stg_grid_points").df()
 
 if grid_df.empty:
