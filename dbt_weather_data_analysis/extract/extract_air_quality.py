@@ -64,6 +64,12 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
             }))
 
         arr_aq_df = pd.concat(arr_aq, ignore_index=True)
+        con.execute("""
+            delete from raw.raw_air_quality
+            where (arrondissement_name, point_grid_id, timestamp) in (
+                select arrondissement_name, point_grid_id, timestamp from arr_aq_df
+            )
+        """)
         con.execute("insert into raw.raw_air_quality select * from arr_aq_df")
         print(f"✅ {arr_name} : {len(arr_aq_df)} lignes qualité de l'air écrites")
 

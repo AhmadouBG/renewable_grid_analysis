@@ -2,6 +2,7 @@
 config.py
 Configuration centralisée pour api_weather.py (ingestion météo par grille de points).
 """
+from pathlib import Path
 
 CACHE_PATH = ".cache"
 CACHE_EXPIRE_AFTER_SEC = 86400
@@ -43,3 +44,8 @@ AIR_QUALITY_API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 AIR_QUALITY_HOURLY_VARIABLES = [
     "pm10", "pm2_5", "dust"
 ]
+
+BASE_DIR = Path("/opt/airflow")
+DUCKDB_PATH = BASE_DIR / "output" / "weather_grid_analysis_database.duckdb"
+CACHE_PATH = str(BASE_DIR / ".cache")
+LOCATION_FILE = BASE_DIR / "dbt_weather_data_analysis" / "seeds" / "senegal_arrondissements_location.csv"

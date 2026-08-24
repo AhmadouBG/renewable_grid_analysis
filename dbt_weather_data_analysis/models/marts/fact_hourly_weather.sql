@@ -1,5 +1,9 @@
 -- models/marts/fact_hourly_weather.sql
-{{config (materialized = 'table')}}
+{{ config(
+    materialized='incremental',
+    unique_key=['grid_point_id', 'date_id', 'hour_id'],
+    incremental_strategy='delete+insert'
+) }}
 SELECT
     g.grid_point_id,
     d.date_id,
@@ -25,3 +29,10 @@ FROM
         FROM
             f.timestamp
     ) = h.hour_id
+
+{% if is_incremental() %}
+where cast(f.timestamp as date) >=
+        (select max(d2.date) - interval '2 days' 
+        from {{ this }} t
+        join {{ ref('dim_daily') }} d2 on t.date_id = d2.date_id)
+{% endif %}

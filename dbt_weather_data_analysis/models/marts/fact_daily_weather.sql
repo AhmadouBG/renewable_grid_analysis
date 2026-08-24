@@ -1,5 +1,9 @@
 -- models/marts/fact_daily_weather.sql
-{{config (materialized = 'table')}}
+{{ config(
+    materialized='incremental',
+    unique_key=['grid_point_id', 'date_id'],
+    incremental_strategy='delete+insert'
+) }}
 SELECT
     g.grid_point_id,
     d.date_id,
@@ -19,3 +23,12 @@ FROM
     JOIN {{ref ('dim_grid_point')}} g ON f.arrondissement_id = g.arrondissement_id
     AND f.point_grid_id = g.point_grid_id
     JOIN {{ref ('dim_daily')}} d ON f.date = d.date
+
+
+{% if is_incremental() %}
+where f.date >= (
+    select max(d2.date) - interval '2 days'
+    from {{ this }} t
+    join {{ ref('dim_daily') }} d2 on t.date_id = d2.date_id
+)
+{% endif %}
