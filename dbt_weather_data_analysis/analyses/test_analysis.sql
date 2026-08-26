@@ -51,3 +51,11 @@ select fid, nom, count(*)
 from weather_grid_analysis_database.main_seeds.senegal_arrondissements_location
 where nom = 'Paoscoto'
 group by 1, 2;
+
+select
+    grid_point_id, date_id, hour_id, pm10, pm2_5
+from weather_grid_analysis_database.main.fact_hourly_air_quality
+where pm10 is null or pm2_5 is null
+order by date_id, hour_id
+limit 180;
+

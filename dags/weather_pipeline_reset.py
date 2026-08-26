@@ -10,8 +10,8 @@ WAL_PATH = f"{DB_PATH}.wal"
 
 
 def confirm_and_remove_db(**context):
-    from airflow.models import Variable
-    confirmation = Variable.get("allow_db_reset", default_var="no")
+    from airflow.sdk import Variable
+    confirmation = Variable.get("allow_db_reset", default="yes")
     if confirmation != "yes":
         raise ValueError(
             "Refusing to delete database: set Airflow Variable 'allow_db_reset' to 'yes' "
@@ -27,7 +27,7 @@ def confirm_and_remove_db(**context):
 
 with DAG(
     "weather_pipeline_reset",
-    schedule_interval=None,          # NEVER scheduled — manual trigger only
+    schedule=None,          # NEVER scheduled — manual trigger only
     start_date=datetime(2026, 8, 1),
     catchup=False,
     tags=["destructive", "manual-only"],
@@ -51,12 +51,12 @@ with DAG(
 
     extract_weather = BashOperator(
         task_id="extract_weather",
-        bash_command="python /opt/airflow/extract/extract_weather.py",
+        bash_command="python /opt/airflow/dbt_weather_data_analysis/extract/extract_weather.py",
     )
 
     extract_air_quality = BashOperator(
         task_id="extract_air_quality",
-        bash_command="python /opt/airflow/extract/extract_air_quality.py",
+        bash_command="python /opt/airflow/dbt_weather_data_analysis/extract/extract_air_quality.py",
     )
 
     dbt_staging = BashOperator(
@@ -66,7 +66,7 @@ with DAG(
 
     dbt_build_dims = BashOperator(
         task_id="dbt_build_dims",
-        bash_command=f"{DBT_CMD} run --select dim_date dim_hourly --profiles-dir .",
+        bash_command=f"{DBT_CMD} run --select dim_daily dim_hourly --profiles-dir .",
     )
 
     dbt_facts_full_refresh = BashOperator(
@@ -81,7 +81,7 @@ with DAG(
         task_id="dbt_marts",
         bash_command=(
             f"{DBT_CMD} run --exclude stg_grid_points dim_grid_point "
-            f"stg_hourly stg_daily stg_air_quality dim_date dim_hourly "
+            f"stg_hourly stg_daily stg_air_quality dim_daily dim_hourly "
             f"fact_hourly_weather fact_daily_weather fact_hourly_air_quality --profiles-dir ."
         ),
     )

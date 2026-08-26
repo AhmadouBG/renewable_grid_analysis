@@ -1,8 +1,10 @@
--- models/marts/dim_hourly.sql
-{{config (materialized = 'table')}}
+{{ config(materialized = 'table') }}
+
 SELECT
     hour AS hour_id,
     hour,
+    -- Crée un format texte propre pour Power BI (ex: 06:00, 14:00)
+    LPAD(hour::text, 2, '0') || ':00' AS hour_formatted,
     CASE
         WHEN hour BETWEEN 6 AND 11  THEN 'Matin'
         WHEN hour BETWEEN 12 AND 17  THEN 'Après-midi'

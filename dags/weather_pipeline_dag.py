@@ -11,7 +11,7 @@ default_args = {
 
 with DAG(
     "weather_pipeline_ingest",
-    schedule_interval="0 6 */2 * *",   # every 2 days at 6am
+    schedule="0 6 */2 * *",   # every 2 days at 6am
     start_date=datetime(2026, 8, 1),
     catchup=False,
     default_args=default_args,
@@ -36,7 +36,7 @@ with DAG(
 
     dbt_build_dims = BashOperator(
         task_id="dbt_build_dims",
-        bash_command=f"{DBT_CMD} run --select dim_date dim_hourly --profiles-dir .",
+        bash_command=f"{DBT_CMD} run --select dim_daily dim_hourly --profiles-dir .",
     )
 
     dbt_facts = BashOperator(
@@ -48,7 +48,7 @@ with DAG(
         task_id="dbt_marts",
         bash_command=(
             f"{DBT_CMD} run --exclude stg_grid_points dim_grid_point "
-            f"stg_hourly stg_daily stg_air_quality dim_date dim_hourly "
+            f"stg_hourly stg_daily stg_air_quality dim_daily dim_hourly "
             f"fact_hourly_weather fact_daily_weather fact_hourly_air_quality --profiles-dir ."
         ),
     )

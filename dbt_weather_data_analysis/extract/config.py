@@ -44,6 +44,7 @@ AIR_QUALITY_API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 AIR_QUALITY_HOURLY_VARIABLES = [
     "pm10", "pm2_5", "dust"
 ]
+AIR_QUALITY_FORECAST_DAYS = 4
 
 BASE_DIR = Path("/opt/airflow")
 DUCKDB_PATH = BASE_DIR / "dbt_weather_data_analysis" /"output" / "weather_grid_analysis_database.duckdb"
