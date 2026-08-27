@@ -1,4 +1,4 @@
--- models/marts/kpi_potential.sql
+-- models/marts/kpi_generation_potential.sql
 {{ config(materialized='table') }}
 
 with base as (

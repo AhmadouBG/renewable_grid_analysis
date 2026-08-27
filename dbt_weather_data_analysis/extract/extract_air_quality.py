@@ -35,8 +35,9 @@ for arr_name, group in grid_df.groupby("arrondissement_name"):
             "hourly": config.AIR_QUALITY_HOURLY_VARIABLES,
             "timezone": config.TIMEZONE,
             "past_days": config.PAST_DAYS,
-            "forecast_days": config.FORECAST_DAYS,
-        }
+            "forecast_days": config.AIR_QUALITY_FORECAST_DAYS,   # separate from weather's
+}
+
         responses = openmeteo.weather_api(config.AIR_QUALITY_API_URL, params=params)
 
         if len(responses) != len(group):

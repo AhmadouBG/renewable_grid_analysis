@@ -50,3 +50,7 @@ BASE_DIR = Path("/opt/airflow")
 DUCKDB_PATH = BASE_DIR / "dbt_weather_data_analysis" /"output" / "weather_grid_analysis_database.duckdb"
 CACHE_PATH = str(BASE_DIR / ".cache")
 LOCATION_FILE = BASE_DIR / "dbt_weather_data_analysis" / "seeds" / "senegal_arrondissements_location.csv"
+
+# config.py — add
+PARQUET_DIR = BASE_DIR / "output" / "parquet"
+PARQUET_DIR.mkdir(parents=True, exist_ok=True)

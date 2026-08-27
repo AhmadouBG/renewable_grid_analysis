@@ -58,6 +58,11 @@ with DAG(
         bash_command=f"{DBT_CMD} test --profiles-dir .",
     )
 
+    export_parquet = BashOperator(
+        task_id="export_parquet",
+        bash_command="python /opt/airflow/extract/extract_parquet.py",
+    )
+
     (
         extract_weather
         >> extract_air_quality
@@ -66,4 +71,5 @@ with DAG(
         >> dbt_facts
         >> dbt_marts
         >> dbt_test
+        >> export_parquet
     )
