@@ -2,6 +2,7 @@
 config.py
 Configuration centralisée pour api_weather.py (ingestion météo par grille de points).
 """
+import os
 from pathlib import Path
 
 CACHE_PATH = ".cache"
@@ -44,13 +45,18 @@ AIR_QUALITY_API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 AIR_QUALITY_HOURLY_VARIABLES = [
     "pm10", "pm2_5", "dust"
 ]
-AIR_QUALITY_FORECAST_DAYS = 4
+AIR_QUALITY_FORECAST_DAYS = 7
 
-BASE_DIR = Path("/opt/airflow")
-DUCKDB_PATH = BASE_DIR / "dbt_weather_data_analysis" /"output" / "weather_grid_analysis_database.duckdb"
+# Auto-detect environment: Docker/Airflow vs local Windows dev
+# Use AIRFLOW_HOME env var (always set inside Airflow/Docker, never locally)
+_AIRFLOW_DIR = Path("/opt/airflow")
+_LOCAL_DIR = Path(__file__).resolve().parents[1]  # dbt_weather_data_analysis/
+
+BASE_DIR = _AIRFLOW_DIR if os.environ.get("AIRFLOW_HOME") else _LOCAL_DIR
+
+DUCKDB_PATH = BASE_DIR / "output" / "weather_grid_analysis_database.duckdb"
 CACHE_PATH = str(BASE_DIR / ".cache")
-LOCATION_FILE = BASE_DIR / "dbt_weather_data_analysis" / "seeds" / "senegal_arrondissements_location.csv"
+LOCATION_FILE = BASE_DIR / "seeds" / "senegal_arrondissements_location.csv"
 
-# config.py — add
 PARQUET_DIR = BASE_DIR / "output" / "parquet"
 PARQUET_DIR.mkdir(parents=True, exist_ok=True)

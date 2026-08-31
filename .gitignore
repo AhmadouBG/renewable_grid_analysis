@@ -2,3 +2,6 @@
 __pycache__/
 data_lake/
 dbt_weather_data_analysis/output/
+
+# Airflow runtime — contains symlinks Git on Windows can't traverse
+logs/

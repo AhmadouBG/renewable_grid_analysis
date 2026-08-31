@@ -59,3 +59,11 @@ where pm10 is null or pm2_5 is null
 order by date_id, hour_id
 limit 180;
 
+select
+    d.date,
+    count(*) as total,
+    count(avg_pm10) as non_null
+from weather_grid_analysis_database.main.kpi_preventive_maintenance_window m
+join weather_grid_analysis_database.main.dim_daily d on m.date_id = d.date_id
+group by 1
+order by 1;

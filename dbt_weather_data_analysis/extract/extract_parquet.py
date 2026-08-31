@@ -12,6 +12,6 @@ TABLES_TO_EXPORT = [
 con = duckdb.connect(str(config.DUCKDB_PATH), read_only=True)
 for table in TABLES_TO_EXPORT:
     out_path = config.PARQUET_DIR / f"{table}.parquet"
-    con.execute(f"copy {table} to '{out_path}' (format parquet)")
+    con.execute(f"COPY {table} TO '{out_path}' (FORMAT PARQUET)")
     print(f"Exported {table}")
 con.close()
