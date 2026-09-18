@@ -319,7 +319,7 @@ Open your `.pbix` file and point the data source to the **`output/`** folder con
 | `_AIRFLOW_WWW_USER_USERNAME` | ⬜ | Admin UI username (default: `airflow`) |
 | `_AIRFLOW_WWW_USER_PASSWORD` | ⬜ | Admin UI password (default: `airflow`) |
 
-> ⚠️ **Never commit your real `.env` file** — it is already listed in `.gitignore`.
+#### Daily:
 arrondissement_name               varchar │  description: Nom de l'arrondissement
 │ point_grid_id                     bigint  │  description: Identifiant unique du point de grille
 │ latitude                          double  │  description: Latitude du point de grille
