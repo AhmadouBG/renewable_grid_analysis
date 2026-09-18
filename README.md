@@ -67,7 +67,10 @@ This project builds a fully automated pipeline to support renewable energy grid 
 | direct_radiation_w_m2 | float | Direct radiation in Watts per square meter |
 | shortwave_radiation_w_m2 | float | Shortwave radiation in Watts per square meter |
 | wind_speed_80m_kmh | float | Wind speed at 80 meters in kilometers per hour |
-
+| wind_direction_80m_deg | float | wind direction |
+| precipitation_mm | float | precipitation |
+| visibility_m | float | visibility |
+| weather_code_wmo | float | weather code |
 ---
 ## Architecture
 
