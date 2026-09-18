@@ -9,6 +9,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [Data](#Data)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -31,7 +32,43 @@ This project builds a fully automated pipeline to support renewable energy grid 
 4. **Exports** final mart tables as Parquet files for Power BI consumption.
 
 ---
+## Data
 
+#### Daily:
+
+| Variable | Type | Description |
+|---|---|---|
+| arrondissement_name | varchar | Name of the arrondissement |
+| point_grid_id | bigint | Unique identifier of the grid point |
+| latitude | double | Latitude of the grid point |
+| longitude | double | Longitude of the grid point |
+| temp_max_2m | float | Maximum daily air temperature at 2 meters above ground |
+| temp_mean_2m | float | Mean daily air temperature at 2 meters above ground |
+| temp_min_2m | float | Minimum daily air temperature at 2 meters above ground |
+| precipitation_sum_mm | float | Sum of daily precipitation |
+| rain_sum_mm | float | Sum of daily rainfall |
+| precipitation_probability_max_pct | float | Maximum daily precipitation probability |
+| sunshine_duration_sec | float | Daily sum of sunshine duration |
+| daylight_duration_sec | float | Daily sum of daylight duration |
+| wind_speed_max_10m_kmh | float | Maximum daily wind speed at 10 meters |
+| wind_gusts_max_10m_kmh | float | Maximum daily wind gusts at 10 meters |
+| shortwave_radiation_sum_mj_m2 | float | Daily sum of shortwave radiation |
+
+#### Hourly:
+
+| Variable | Type | Description |
+|---|---|---|
+| arrondissement_name | varchar | Name of the arrondissement |
+| point_grid_id | bigint | Unique identifier of the grid point |
+| latitude | double | Latitude of the grid point |
+| longitude | double | Longitude of the grid point |
+| temperature_2m | float | Temperature at 2 meters above ground |
+| cloud_cover_pct | float | Cloud cover percentage |
+| direct_radiation_w_m2 | float | Direct radiation in Watts per square meter |
+| shortwave_radiation_w_m2 | float | Shortwave radiation in Watts per square meter |
+| wind_speed_80m_kmh | float | Wind speed at 80 meters in kilometers per hour |
+
+---
 ## Architecture
 
 ```
@@ -319,34 +356,4 @@ Open your `.pbix` file and point the data source to the **`output/`** folder con
 | `_AIRFLOW_WWW_USER_USERNAME` | ⬜ | Admin UI username (default: `airflow`) |
 | `_AIRFLOW_WWW_USER_PASSWORD` | ⬜ | Admin UI password (default: `airflow`) |
 
-#### Daily:
-arrondissement_name               varchar │  description: Nom de l'arrondissement
-│ point_grid_id                     bigint  │  description: Identifiant unique du point de grille
-│ latitude                          double  │  description: Latitude du point de grille
-│ longitude                         double  │  description: Longitude du point de grille
-│ temp_max_2m                       float   │  description: Maximum daily air temperature at 2 meters above ground
-│ temp_mean_2m                      float   │  description: Mean daily air temperature at 2 meters above ground
-│ temp_min_2m                       float   │  description: Minimum daily air temperature at 2 meters above ground
-│ precipitation_sum_mm              float   │  description: Sum of daily precipitation
-│ rain_sum_mm                       float   │  description: Sum of daily rainfall
-│ precipitation_probability_max_pct float   │  description: Maximum daily precipitation probability
-│ sunshine_duration_sec             float   │  description: Daily sum of sunshine duration
-│ daylight_duration_sec             float   │  description: Daily sum of daylight duration
-│ wind_speed_max_10m_kmh            float   │  description: Maximum daily wind speed at 10 meters
-│ wind_gusts_max_10m_kmh            float   │  description: Maximum daily wind gusts at 10 meters
-│ shortwave_radiation_sum_mj_m2     float   │  description: Daily sum of shortwave radiation
 
-#### hourly:
-arrondissement_name               varchar │  description: Nom de l'arrondissement
-│ point_grid_id                     bigint  │  description: Identifiant unique du point de grille
-│ latitude                          double  │  description: Latitude du point de grille
-│ longitude                         double  │  description: Longitude du point de grille
-│ temperature_2m                    float   │  description: temperature at 2 meters above ground
-│ cloud_cover_pct                   float   │  description: cloud cover
-│ direct_radiation_w_m2             float   │  description: direct radiation
-│ shortwave_radiation_w_m2          float   │  description: shortwave radiation
-│ wind_speed_80m_kmh                float   │  description: wind speed
-│ wind_direction_80m_deg            float   │  description: wind direction
-│ precipitation_mm                  float   │  description: precipitation
-│ visibility_m                      float   │  description: visibility
-│ weather_code_wmo                  float   │  description: weather code
