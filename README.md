@@ -251,39 +251,11 @@ The four KPI models answer key operational questions for grid planners:
 
 The Power BI report connects directly to the Parquet files exported by the pipeline (`output/*.parquet`).
 
-### 📸 Power BI — Screenshots & Video
-
-> **How to add media:**
-> 1. Create the folder `docs/powerbi/` in the project root.
-> 2. Drop your files in using the filenames below.
-> 3. Uncomment the matching image lines in this README.
->
-> | Suggested filename | What to capture |
-> |---|---|
-> | `overview_page.png` | Dashboard landing / overview page |
-> | `generation_kpi.png` | Generation potential KPI page |
-> | `stability_kpi.png` | Grid stability KPI page |
-> | `harmattan_kpi.png` | Harmattan risk page |
-> | `maintenance_kpi.png` | Maintenance window page |
-> | `dashboard_demo.gif` | Full walkthrough screen recording |
+### 📸 Power BI — Video
 
 <!-- Power BI Overview Page -->
-<!-- ![Power BI Overview](docs/powerbi/overview_page.png) -->
+![Power BI Overview](https://github.com/user-attachments/assets/b66ab1f8-a683-48e3-a04a-6dede0e7b340)
 
-<!-- Generation Potential KPI -->
-<!-- ![Generation Potential](docs/powerbi/generation_kpi.png) -->
-
-<!-- Grid Stability KPI -->
-<!-- ![Grid Stability](docs/powerbi/stability_kpi.png) -->
-
-<!-- Harmattan Risk -->
-<!-- ![Harmattan Risk](docs/powerbi/harmattan_kpi.png) -->
-
-<!-- Maintenance Window -->
-<!-- ![Maintenance Window](docs/powerbi/maintenance_kpi.png) -->
-
-<!-- Full Dashboard Demo -->
-<!-- ![Dashboard Demo](docs/powerbi/dashboard_demo.gif) -->
 
 ---
 
