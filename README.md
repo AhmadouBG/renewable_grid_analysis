@@ -110,7 +110,7 @@ Open-Meteo API
 | Geospatial | GeoPandas, Shapely, PyProj |
 | Containerisation | Docker / Docker Compose |
 | Visualisation | Power BI |
-| Language | Python 3.x |
+| Language | Python 3.12.10 |
 
 ---
 
@@ -203,10 +203,10 @@ export_parquet       (writes Parquet files to /output)
 > | `dag_demo.gif` | Screen recording of a live DAG run (convert mp4 → gif with e.g. [gifski](https://gif.ski/)) |
 
 <!-- Airflow DAG Graph View -->
-<!-- ![DAG Graph View](docs/airflow/dag_graph_view.png) -->
+<!-- ![DAG Graph View](docs/capture.png) -->
 
 <!-- Airflow Gantt / Timeline -->
-<!-- ![DAG Gantt View](docs/airflow/dag_gantt.png) -->
+<!-- ![DAG Gantt View](docs/capture1.png) -->
 
 <!-- Airflow Demo Recording -->
 <!-- ![DAG Demo](docs/airflow/dag_demo.gif) -->
