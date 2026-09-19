@@ -190,10 +190,10 @@ export_parquet       (writes Parquet files to /output)
 
 ### 📸 Airflow DAG — Screenshots
 <!-- Airflow DAG Graph View -->
-![DAG Graph View](docs/Capture.png) 
+![DAG Graph View](docs/Capture.PNG) 
 
 <!-- Airflow Gantt / Timeline -->
-![DAG Gantt View](docs/Capture1.png)
+![DAG Gantt View](docs/Capture1.PNG)
 
 <!-- Airflow Demo Recording -->
 <!-- ![DAG Demo](docs/airflow/dag_demo.gif) -->
