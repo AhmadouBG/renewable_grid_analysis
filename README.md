@@ -254,7 +254,7 @@ The Power BI report connects directly to the Parquet files exported by the pipel
 ### 📸 Power BI — Video
 
 <!-- Power BI Overview Page -->
-![Power BI Overview](https://github.com/user-attachments/assets/b66ab1f8-a683-48e3-a04a-6dede0e7b340)
+https://github.com/user-attachments/assets/b66ab1f8-a683-48e3-a04a-6dede0e7b340
 
 
 ---
