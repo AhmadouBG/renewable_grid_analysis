@@ -188,25 +188,12 @@ dbt_test             (dbt data quality tests)
 export_parquet       (writes Parquet files to /output)
 ```
 
-### 📸 Airflow DAG — Screenshots & Video
-
-> **How to add media:**
-> 1. Create the folder `docs/airflow/` in the project root.
-> 2. Drop your files in using the filenames below.
-> 3. Uncomment the matching image lines in this README.
->
-> | Suggested filename | What to capture |
-> |---|---|
-> | `dag_graph_view.png` | DAG graph view from the Airflow UI |
-> | `dag_gantt.png` | Gantt / timeline view of a successful run |
-> | `dag_run_log.png` | Task log showing a green/successful run |
-> | `dag_demo.gif` | Screen recording of a live DAG run (convert mp4 → gif with e.g. [gifski](https://gif.ski/)) |
-
+### 📸 Airflow DAG — Screenshots
 <!-- Airflow DAG Graph View -->
-<!-- ![DAG Graph View](docs/capture.png) -->
+![DAG Graph View](docs/Capture.png) 
 
 <!-- Airflow Gantt / Timeline -->
-<!-- ![DAG Gantt View](docs/capture1.png) -->
+![DAG Gantt View](docs/Capture1.png)
 
 <!-- Airflow Demo Recording -->
 <!-- ![DAG Demo](docs/airflow/dag_demo.gif) -->
